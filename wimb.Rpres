@@ -1,0 +1,55 @@
+The Walters Illuminated Manuscript Browser
+========================================================
+author: Dominic Mimnagh
+date: `r date()`
+
+Researching Medieval Manuscripts
+========================================================
+
+
+Illuminated manuscripts are texts that are richly illustrated, usually with gold or silver decoration. The oldest respresentations are from around the year 500, and they provide us with an amazing window into the past. The study of illuminated manuscripts has been enhanced in recent times with attempts to make the research more freely available. Many museums now make their research avialable online in structured, or semi-structured ways.
+
+The Walters Art Museum has created the [Digital Walters](http://www.thedigitalwalters.org/) to publish information on their manuscripts. I also used Dot Porter's Github project to better understand the format of the XML used https://github.com/leoba/mesa.
+
+Features
+========================================================
+
+The app allows you to browse the database by providing a range of dates using a slider. To do this we must first extract the data from the XML using XPath syntax. 
+
+This is the section of XML used for the title:
+
+    <title type="work" n="item 1117" xml:id="n563.074219">Ethiopian "chain" manuscript</title>
+
+=====
+
+And this R code provides us with the title of the book:
+
+```{r, eval=FALSE}
+df<-bindElements(df, 
+"/tei:TEI/tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title[@type='common']"
+,dataInt,"dcterms:title",idVal)
+```
+
+====
+I created a number of support functions as well, to extract values from the XML tag element:
+
+```{r eval=FALSE}
+bindElements<-function(df,xpath,dataInt,name,idVal){
+  #  ns<-c(tei="http://www.tei-c.org/ns/1.0")  
+  elements=xpathSApply(dataInt,xpath,xmlValue,namespaces=ns)
+  if(length(elements)>0){
+    dfElements<-data.frame(element=elements)
+    dfElements$idVal<-idVal
+    dfElements$name<-name
+    df<-rbind(df,dfElements)  
+  }
+  df
+}
+```
+
+this extracted the data into a "tidy" data format useful in R.
+
+Future Work
+===============================================================================
+
+This implementation only uses the date range, however, there is plenty of useful information available and work remains to explore ways to link the data to other data sources at other institutions. This "Linked Open Data" application would provide a tool that could leverage the efforts of other researchers in a very efficient way. 
