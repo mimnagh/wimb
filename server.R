@@ -129,7 +129,6 @@ names(kw)<-kw
 
 
 shinyServer(function(input, output,session) {
-  
   updateSelectizeInput(session, 'keywords', server = FALSE, choices =  kw)
   library(reshape2)
   output$view <- DT::renderDataTable({
